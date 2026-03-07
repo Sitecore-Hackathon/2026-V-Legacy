@@ -22,21 +22,20 @@ const MastheadWithImage = ({ fields, rendering }: MastheadWithImageProps): JSX.E
   const src = img?.src ?? '';
 
   return (
-    <section
-      className="container flex flex-col gap-4 lg:flex-row"
-      aria-labelledby={`masthead-${uid}`}
-    >
-      <div className="m-auto w-1/2">
-        <Text tag="p" className="text-h2 w-fit mb-4" field={fields.heading} />
-        <Text tag="p" className="text-copy-medium w-[80%]" field={fields.description} />
-      </div>
-      {src && (
-        <div className="rounded-lg overflow-hidden aspect-4/3 w-1/2">
-          {/* eslint-disable-next-line jsx-a11y/alt-text */}
-          {/* @ts-expect-error - alt omitted intentionally for a11y testing */}
-          <Image src={src} width={1200} height={630} className="size-full object-cover" />
+    <section className="bg-amber-500 py-large" aria-labelledby={`masthead-${uid}`}>
+      <div className="container my-0 flex flex-col gap-4 lg:flex-row">
+        <div className="m-auto w-1/2">
+          <Text tag="p" className="text-h2 w-fit mb-4" field={fields.heading} />
+          <Text tag="p" className="text-copy-medium w-[80%]" field={fields.description} />
         </div>
-      )}
+        {src && (
+          <div className="rounded-lg overflow-hidden aspect-4/3 w-1/2">
+            {/* eslint-disable-next-line jsx-a11y/alt-text */}
+            {/* @ts-expect-error - alt omitted intentionally for a11y testing */}
+            <Image src={src} width={1200} height={630} className="size-full object-cover" />
+          </div>
+        )}
+      </div>
     </section>
   );
 };
