@@ -1,0 +1,215 @@
+a[target='_blank']:after {
+  content: '\1F5D7'
+}
+
+/*
+  Hides Sitecore editor markup,
+  if you run the app in connected mode while the Sitecore cookies
+  are set to edit mode.
+*/
+.scChromeData, .scpm { display: none !important; }
+
+/*
+  Styles for default JSS error components
+*/
+.sc-jss-editing-error,
+.sc-jss-placeholder-error {
+  padding: 1em;
+  background-color: lightyellow;
+}
+
+/* 
+  Style for default content block
+*/
+.contentTitle {
+    font-size: 3.5rem;
+    font-weight: 300;
+    line-height: 1.2;
+}
+
+/* Simple Masthead */
+.simple-masthead {
+  margin-bottom: 2rem;
+}
+.simple-masthead__heading {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+.simple-masthead__description {
+  font-size: 1.125rem;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+/* Masthead with Image */
+.masthead-with-image {
+  display: grid;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 768px) {
+  .masthead-with-image {
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+  }
+}
+.masthead-with-image__heading {
+  font-size: 2.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+.masthead-with-image__description {
+  font-size: 1rem;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+.masthead-with-image__img {
+  width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+}
+
+/* CTA Row */
+.cta-row {
+  margin-bottom: 2rem;
+  padding: 1.5rem 0;
+}
+.cta-row__heading {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+.cta-row__description {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+.cta-row__link {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: #0066cc;
+  color: #fff;
+  border-radius: 0.25rem;
+}
+.cta-row__link:hover {
+  background: #0052a3;
+  text-decoration: none;
+  color: #fff;
+}
+
+/* RTF Row */
+.rtf-row {
+  margin-bottom: 2rem;
+}
+.rtf-row__body {
+  font-size: 1rem;
+  line-height: 1.7;
+}
+.rtf-row__body p {
+  margin-bottom: 0.75rem;
+}
+
+/* Card List */
+.card-list {
+  margin-bottom: 2rem;
+}
+.card-list__heading {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+.card-list__cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 640px) {
+  .card-list__cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 1024px) {
+  .card-list__cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+.card-list__card {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: #fff;
+}
+.card-list__card-media {
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: #f3f4f6;
+}
+.card-list__card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.card-list__card-link {
+  display: block;
+  padding: 0.75rem 1rem;
+  font-weight: 500;
+  color: #0066cc;
+}
+.card-list__card-link:hover {
+  text-decoration: none;
+  background: #f9fafb;
+  color: #0052a3;
+}
+
+/* Quote Row */
+.quote-row {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #f9fafb;
+  border-radius: 0.5rem;
+  border-left: 4px solid #0066cc;
+  display: grid;
+  gap: 1rem;
+  align-items: center;
+}
+@media (min-width: 640px) {
+  .quote-row {
+    grid-template-columns: 1fr auto;
+    padding: 1.5rem 2rem;
+  }
+}
+.quote-row__blockquote {
+  margin: 0;
+  font-size: 1.125rem;
+  line-height: 1.6;
+}
+.quote-row__quote {
+  margin: 0 0 0.5rem 0;
+  white-space: pre-line;
+}
+.quote-row__author {
+  font-size: 0.9375rem;
+  font-style: italic;
+  color: #4b5563;
+}
+.quote-row__media {
+  flex-shrink: 0;
+}
+.quote-row__image {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
