@@ -27,11 +27,11 @@ const QuoteRow = ({ fields, rendering }: QuoteRowProps): JSX.Element => {
       className="container max-w-[1020px] flex flex-col gap-4 lg:flex-row"
       aria-labelledby={`quote-row-${uid}`}
     >
-      <blockquote className="w-[80%] flex flex-col justify-center">
-        <Text tag="p" className="text-h3 mb-4" field={fields.quote} />
-        <p className="text-copy-medium italic text-monochrome/50">
+      <blockquote className="w-[80%] flex flex-col justify-center" cite={fields.author?.value}>
+        <Text tag="h2" className="text-h3 mb-4" field={fields.quote} id={`quote-row-${uid}`} />
+        <div className="text-copy-medium italic text-monochrome/50">
           - <Text tag="span" field={fields.author} />
-        </p>
+        </div>
       </blockquote>
       {src && (
         <div className="w-[350px] relative">
@@ -40,7 +40,7 @@ const QuoteRow = ({ fields, rendering }: QuoteRowProps): JSX.Element => {
           <div className="rounded-full overflow-hidden aspect-square size-full">
             <Image
               src={src}
-              alt={alt}
+              alt={alt ?? ''}
               width={120}
               height={120}
               className="size-full object-cover"
