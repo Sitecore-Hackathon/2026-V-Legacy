@@ -11,7 +11,9 @@ const publicUrl = config.publicUrl;
 interface LayoutProps {
   layoutData: LayoutServiceData;
   headLinks: HTMLLink[];
-  componentFactory?: (name: string) => React.ComponentType<{ rendering: unknown; params: Record<string, string> }> | null;
+  componentFactory?: (
+    name: string
+  ) => React.ComponentType<{ rendering: unknown; params: Record<string, string> }> | null;
 }
 
 interface RouteFields {
@@ -26,9 +28,9 @@ const Layout = ({ layoutData, headLinks, componentFactory }: LayoutProps): JSX.E
 
   // When a route template component exists (e.g. GenericLandingPage, GenericDetailPage), use it; otherwise render the placeholder directly.
   const routeName = route?.name;
-  const RouteComponent =
-    componentFactory && routeName ? componentFactory(routeName) : null;
-  const routeParams = route && 'params' in route ? (route as { params?: Record<string, string> }).params : {};
+  const RouteComponent = componentFactory && routeName ? componentFactory(routeName) : null;
+  const routeParams =
+    route && 'params' in route ? (route as { params?: Record<string, string> }).params : {};
   const mainContent =
     RouteComponent && route ? (
       <RouteComponent rendering={route} params={routeParams || {}} />
@@ -49,7 +51,7 @@ const Layout = ({ layoutData, headLinks, componentFactory }: LayoutProps): JSX.E
 
       <Navigation />
       {/* root placeholder for the app, which we add components to using route data */}
-      <div className="container">{mainContent}</div>
+      <div className="body">{mainContent}</div>
     </>
   );
 };

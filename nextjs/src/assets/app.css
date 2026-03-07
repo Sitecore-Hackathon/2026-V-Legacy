@@ -206,6 +206,67 @@ a[target='_blank']:after {
   object-fit: cover;
 }
 
+/* Form Row */
+.form-row {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #f9fafb;
+  border-radius: 0.5rem;
+  max-width: 32rem;
+}
+.form-row__heading {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+.form-row__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.form-row__label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.form-row__label-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+.form-row__input,
+.form-row__textarea {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+  font-size: 1rem;
+  font-family: inherit;
+}
+.form-row__input:focus,
+.form-row__textarea:focus {
+  outline: none;
+  border-color: #0066cc;
+  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
+}
+.form-row__textarea {
+  resize: vertical;
+  min-height: 6rem;
+}
+.form-row__submit {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #fff;
+  background: #0066cc;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  align-self: flex-start;
+}
+.form-row__submit:hover {
+  background: #0052a3;
+}
+
 a {
   text-decoration: none;
 }

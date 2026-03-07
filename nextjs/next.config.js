@@ -6,7 +6,12 @@ const publicUrl = jssConfig.publicUrl;
 /**
  * @type {import('next').NextConfig}
  */
+const path = require('path');
+
 const nextConfig = {
+  // Fix workspace root detection when in monorepo (ensures PostCSS/Tailwind resolve correctly)
+  outputFileTracingRoot: path.join(__dirname),
+
   // Set assetPrefix to our public URL
   assetPrefix: publicUrl,
 
@@ -54,6 +59,25 @@ const nextConfig = {
         port: '',
       },
     ]
+  },
+
+  webpack(config) {
+    const fileLoaderRule = config.module.rules.find((rule) =>
+      rule.test?.test?.('.svg')
+    );
+    if (fileLoaderRule) {
+      config.module.rules.push(
+        { ...fileLoaderRule, test: /\.svg$/i, resourceQuery: /url/ },
+        {
+          test: /\.svg$/i,
+          issuer: fileLoaderRule.issuer,
+          resourceQuery: { not: [...(fileLoaderRule.resourceQuery?.not || []), /url/] },
+          use: ['@svgr/webpack'],
+        }
+      );
+      fileLoaderRule.exclude = /\.svg$/i;
+    }
+    return config;
   },
 
   async rewrites() {

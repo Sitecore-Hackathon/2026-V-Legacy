@@ -14,13 +14,12 @@ type SimpleMastheadProps = ComponentProps & {
  */
 const SimpleMasthead = ({ fields }: SimpleMastheadProps): JSX.Element => (
   <div>
-    <div>test23</div>
-  <header className="simple-masthead">
-    <Text tag="h1" className="simple-masthead__heading" field={fields.heading} />
-    <div className="simple-masthead__description">
-      <Text field={fields.description} />
-    </div>
-  </header>
+    <header className="simple-masthead">
+      <Text tag="h1" className="simple-masthead__heading" field={fields.heading} />
+      <div className="simple-masthead__description">
+        <Text field={fields.description} />
+      </div>
+    </header>
   </div>
 );
 
