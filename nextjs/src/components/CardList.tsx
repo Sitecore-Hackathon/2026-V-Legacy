@@ -43,39 +43,51 @@ function getCardLink(item: CardItem | undefined) {
 /**
  * CardList: heading and a list of cards. Each card has an image and a link.
  */
-const CardList = ({ fields }: CardListProps): JSX.Element => {
+const CardList = ({ fields, rendering }: CardListProps): JSX.Element => {
   const heading = fields.heading;
   const cards = fields.cards;
+  const uid = rendering.uid;
+
   return (
-    <section className="card-list">
-      <Text tag="h2" className="card-list__heading" field={heading} />
-      <ul className="card-list__cards">
+    <section className="container" aria-labelledby={`card-list-${uid}`}>
+      <Text tag="p" className="text-h2 text-center mb-4" field={heading} />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {Array.isArray(cards) &&
           cards.map((card, index) => {
             const image = getCardImage(card as CardItem);
             const link = getCardLink(card as CardItem);
 
             return (
-              <li key={(card as CardItem)?.id ?? index} className="card-list__card">
+              <li
+                key={(card as CardItem)?.id ?? index}
+                className="relative rounded-lg flex flex-col group overflow-hidden"
+              >
                 {image.src && (
-                  <div className="">
-                    {/* eslint-disable-next-line jsx-a11y/alt-text */}
-                    {/* @ts-expect-error - alt omitted intentionally for a11y testing */}
-                    <Image src={image.src} width={400} height={250} className="" />
-                  </div>
+                  <a
+                    href={link.href}
+                    target={link.target}
+                    rel={link.target === '_blank' ? 'noopener noreferrer' : undefined}
+                    className="after:content-[''] after:absolute after:inset-0 after:w-full after:h-full after:z-1"
+                  >
+                    <div className="aspect-square size-full overflow-hidden">
+                      {/* eslint-disable-next-line jsx-a11y/alt-text */}
+                      {/* @ts-expect-error - alt omitted intentionally for a11y testing */}
+                      <Image
+                        src={image.src}
+                        width={400}
+                        height={250}
+                        className="size-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                  </a>
                 )}
-                <a
-                  href={link.href}
-                  target={link.target}
-                  rel={link.target === '_blank' ? 'noopener noreferrer' : undefined}
-                  className="card-list__card-link"
-                >
-                  {link.text}
-                </a>
+                <div className="p-4 bg-amber-100 group-hover:bg-amber-200 transition-colors duration-300">
+                  <p className="text-copy-medium text-center">{link.text}</p>
+                </div>
               </li>
             );
           })}
-      </ul>
+      </div>
     </section>
   );
 };
