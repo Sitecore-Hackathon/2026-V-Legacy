@@ -10,6 +10,10 @@
 import { useMarketplaceClient } from "@/components/providers/marketplace"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
+import { Skeleton } from "@/components/ui/skeleton"
+import { cn } from "@/lib/utils"
+import axe from "axe-core"
 import { useEffect, useRef, useState } from "react"
 
 /* -------------------------------------------------------------------------- */
@@ -83,6 +87,19 @@ function calculateScore(issues: StructuredIssue[]) {
   })
 
   return Math.max(score, 0)
+}
+
+/** Parse issue title: prefer human-readable help, fallback to formatted type (e.g. "button-name" → "Button name"). */
+function formatIssueTitle(issue: StructuredIssue): string {
+  const help = issue.help?.trim()
+  if (help) return help
+  const type = issue.type?.trim()
+  if (!type) return "Accessibility issue"
+  // Format kebab-case rule IDs: "button-name" → "Button name"
+  return type
+    .split(/[-_\s]+/)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(" ")
 }
 
 /* -------------------------------------------------------------------------- */
@@ -341,10 +358,26 @@ export default function AccessibilityScanner() {
   /* UI */
   /* ---------------------------------------------------------------------- */
 
-  return (
-    <div className="space-y-4">
+  if (loading) return <Skeleton className="rounded-lg w-inherit h-[90vh] m-4 bg-gray-100" />
 
-      <p className="text-muted-foreground text-sm">
+
+  const scoreColor = cn({
+    'text-success': result?.accessibilityScore && result.accessibilityScore > 80,
+    'text-warning-400': result?.accessibilityScore && result.accessibilityScore > 60,
+    'text-danger': result?.accessibilityScore && result.accessibilityScore <= 60,
+  })
+  const resultsBoxStyles = cn({
+    'bg-success-50/30 border-success': result?.accessibilityScore && result.accessibilityScore > 80,
+    'bg-warning-50/30 border-warning-300': result?.accessibilityScore && result.accessibilityScore > 60,
+    'bg-danger-50/30 border-danger': result?.accessibilityScore && result.accessibilityScore <= 60,
+  })
+
+  
+
+  return (
+    <div className="p-4 flex flex-col gap-4">
+
+      <p className="text-muted-foreground text-md">
         Scans the Sitecore preview DOM using axe-core and sends issues to AI for explanation.
       </p>
 
@@ -353,30 +386,31 @@ export default function AccessibilityScanner() {
       </Button>
 
       {error && (
-        <Alert variant="destructive">
+        <Alert variant="danger">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
       {result && (
-        <div className="space-y-4 rounded-lg border bg-muted/30 p-4">
-
-          <div className="flex items-center gap-2">
-            <span className="text-2xl font-semibold">{result.accessibilityScore}</span>
-            <span>/ 100</span>
+       <div className={cn("space-y-4 rounded-lg border p-4", resultsBoxStyles)}>
+          <div className="flex items-center gap-1">
+            <p className={cn("text-5xl font-semibold tabular-nums", scoreColor)}>
+              {result.accessibilityScore}
+            </p>
+            <sub className="text-xl text-muted-foreground">/100</sub>
           </div>
 
           <ul className="space-y-3">
             {result.issues.map((i, idx) => (
-              <li key={idx} className="border rounded p-3 text-sm">
+              <li key={idx} className="border bg-white rounded p-3 text-sm">
 
-                <div className="font-medium">
-                  {i.help ?? i.type}
+                <div className="text-md font-bold text-primary">
+                  {formatIssueTitle(i)}
                 </div>
 
                 {i.wcag && (
                   <div className="text-xs text-muted-foreground mt-1">
-                    WCAG: {i.wcag}
+                    <b className="text-md text-gray-800">WCAG:</b> <br/> <p>{i.wcag}</p>
                   </div>
                 )}
 
@@ -386,11 +420,13 @@ export default function AccessibilityScanner() {
                   </pre>
                 )}
 
-                <p className="mt-2">{i.explanation}</p>
+                <div className="mt-2 ">
+                  <b className="text-md font-bold text-warning-400">Description:</b> <br/> <p>{i.explanation}</p>
+                </div>
 
-                <p className="mt-1">
-                  <b>Fix:</b> {i.suggestion}
-                </p>
+                <div className="mt-1">
+                  <b className="text-md font-bold text-success">Fix:</b> <br/> <p>{i.suggestion}</p>
+                </div>
 
                 {i.helpUrl && (
                   <a
