@@ -14,39 +14,46 @@ type FormRowProps = ComponentProps & {
 /**
  * Form Row: heading, name input placeholder text, description textarea placeholder text, and submit button label.
  */
-const FormRow = ({ fields }: FormRowProps): JSX.Element => {
+const FormRow = ({ fields, rendering }: FormRowProps): JSX.Element => {
+  const uid = rendering.uid;
   const namePlaceholder = fields.namePlaceholder?.value ?? 'Name';
   const descriptionPlaceholder = fields.descriptionPlaceholder?.value ?? 'Description';
   const submitLabel = fields.submitLabel?.value ?? 'Submit';
 
   return (
-    <section className="form-row">
-      <Text tag="h2" className="form-row__heading" field={fields.heading} />
-      <form className="form-row__form" onSubmit={(e) => e.preventDefault()}>
-        <label className="form-row__label" htmlFor="form-row-name">
-          <span className="form-row__label-text">{namePlaceholder}</span>
+    <section className="container">
+      <Text tag="p" className="text-h2 mb-4" field={fields.heading} />
+      <form className="flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
+        <div className="flex flex-col gap-2">
+          <label className="" htmlFor={`form-row-name-${uid}`}>
+            <span className="form-row__label-text">{namePlaceholder}</span>
+          </label>
           <input
-            id="form-row-name"
+            id={`form-row-name-${uid}-1`}
             type="text"
             className="form-row__input"
             placeholder={namePlaceholder}
             autoComplete="name"
-            aria-label={namePlaceholder}
           />
-        </label>
-        <label className="form-row__label" htmlFor="form-row-description">
-          <span className="form-row__label-text">{descriptionPlaceholder}</span>
+        </div>
+        <div className="flex flex-col gap-2">
+          <label className="form-row__label" htmlFor={`form-row-description-${uid}2`}>
+            <span className="form-row__label-text">{descriptionPlaceholder}</span>
+          </label>
           <textarea
-            id="form-row-description"
+            id={`form-row-description-${uid}-2`}
             className="form-row__textarea"
             placeholder={descriptionPlaceholder}
             rows={4}
-            aria-label={descriptionPlaceholder}
           />
-        </label>
-        <button type="submit" className="form-row__submit">
-          {submitLabel}
-        </button>
+        </div>
+        <button
+          type="submit"
+          className="bg-primary-dark min-h-[44px] w-fit text-white rounded-sm p-2"
+          role="button"
+          aria-label={submitLabel}
+          aria-hidden="true"
+        ></button>
       </form>
     </section>
   );

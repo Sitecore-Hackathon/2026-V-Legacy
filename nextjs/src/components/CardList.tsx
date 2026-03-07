@@ -81,7 +81,7 @@ const CardList = ({ fields, rendering }: CardListProps): JSX.Element => {
                     </div>
                   </a>
                 )}
-                <div className="p-4 bg-amber-100 group-hover:bg-amber-200 transition-colors duration-300">
+                <div className="p-4 bg-secondary-light group-hover:bg-secondary transition-colors duration-300">
                   <p className="text-copy-medium text-center">{link.text}</p>
                 </div>
               </li>
