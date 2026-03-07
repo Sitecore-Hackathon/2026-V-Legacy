@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import SimpleMasthead from "./SimpleMasthead";
 
 export default function Home() {
   const [url, setUrl] = useState("");
@@ -35,6 +36,10 @@ export default function Home() {
       </button>
 
       <pre className="mt-6 whitespace-pre-wrap">{result}</pre>
+
+      <div className="mt-6">
+        <SimpleMasthead />
+      </div>
     </div>
   );
 }
