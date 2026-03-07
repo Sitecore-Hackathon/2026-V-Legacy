@@ -7,6 +7,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
+import { cn } from "@/lib/utils"
 import { useEffect, useState } from "react"
 
 type A11yIssue = {
@@ -55,9 +56,22 @@ function AccessibilityScanner() {
     }
   }
 
+  if (loading) return <Skeleton className="h-24 w-full" />
+
+  const scoreColor = cn({
+    'text-success': result?.accessibilityScore && result.accessibilityScore > 80,
+    'text-warning-400': result?.accessibilityScore && result.accessibilityScore > 60,
+    'text-danger': result?.accessibilityScore && result.accessibilityScore <= 60,
+  })
+  const resultsBoxStyles = cn({
+    'bg-success/30 border-success': result?.accessibilityScore && result.accessibilityScore > 80,
+    'bg-warning-50/30 border-warning-300': result?.accessibilityScore && result.accessibilityScore > 60,
+    'bg-danger/30 border-danger': result?.accessibilityScore && result.accessibilityScore <= 60,
+  })
+
   return (
     <div className="space-y-4">
-      <p className="text-muted-foreground text-sm">
+      <p className="text-muted-foreground text-md">
         Scan the current page with an LLM to find accessibility issues (WCAG).
       </p>
       <Button
@@ -74,12 +88,12 @@ function AccessibilityScanner() {
         </Alert>
       )}
       {result && (
-        <div className="space-y-4 rounded-lg border bg-muted/30 p-4">
-          <div className="flex items-center gap-4">
-            <span className="text-2xl font-semibold tabular-nums">
+        <div className={cn("space-y-4 rounded-lg border p-4", resultsBoxStyles)}>
+          <div className="flex items-center gap-1">
+            <p className={cn("text-5xl font-semibold tabular-nums", scoreColor)}>
               {result.accessibilityScore}
-            </span>
-            <span className="text-muted-foreground">/ 100</span>
+            </p>
+            <sub className="text-xl text-muted-foreground">/100</sub>
           </div>
           {result.summary && (
             <p className="text-sm text-muted-foreground">{result.summary}</p>
@@ -95,7 +109,7 @@ function AccessibilityScanner() {
                         issue.severity === "error"
                           ? "text-danger-600 dark:text-danger-400"
                           : issue.severity === "warning"
-                            ? "text-warning-600 dark:text-warning-400"
+                            ? "text-warning-400 dark:text-warning-400"
                             : "text-muted-foreground"
                       }
                     >
