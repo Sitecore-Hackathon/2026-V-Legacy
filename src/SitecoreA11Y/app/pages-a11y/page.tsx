@@ -1,200 +1,425 @@
 "use client"
 
-import { ApplicationContext } from "@/components/examples/built-in-auth/application-context"
-import { ListLanguagesFromClientSdk } from "@/components/examples/built-in-auth/with-xmc/list-languages"
+/**
+ * Accessibility Scanner (Sitecore Pages)
+ *
+ * Runs axe-core inside the Sitecore preview iframe using EXECUTE_IN_PREVIEW.
+ * Issues are enriched by the scan API with AI explanations and suggestions.
+ */
+
 import { useMarketplaceClient } from "@/components/providers/marketplace"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { Skeleton } from "@/components/ui/skeleton"
-import { cn } from "@/lib/utils"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
-type A11yIssue = {
-  severity: "error" | "warning" | "info"
-  message: string
-  wcag?: string
-  element?: string
+/* -------------------------------------------------------------------------- */
+/* Types */
+/* -------------------------------------------------------------------------- */
+
+type ExtractedRendering = {
+  renderingId: string
+  componentId: string
+  placeholder: string
+  dataSource: string
 }
 
-type ScanA11yResult = {
+type StructuredIssue = {
+  type: string
+  description?: string
+  help?: string
+  helpUrl?: string
+  impact?: string
+  wcag?: string
+  element: string
+  html?: string
+  rendering?: string
+  renderingId?: string
+  componentId?: string
+}
+
+type ScanResult = {
+  issues: (StructuredIssue & {
+    explanation: string
+    suggestion: string
+    fixType: "code" | "content"
+  })[]
   accessibilityScore: number
-  issues: A11yIssue[]
-  suggestions: string[]
   summary?: string
 }
 
-function AccessibilityScanner() {
-  const [result, setResult] = useState<ScanA11yResult | null>(null)
+/* -------------------------------------------------------------------------- */
+/* Constants */
+/* -------------------------------------------------------------------------- */
+
+const EXECUTE_IN_PREVIEW = "EXECUTE_IN_PREVIEW"
+const A11Y_SCAN_RESULT = "A11Y_SCAN_RESULT"
+
+/* -------------------------------------------------------------------------- */
+/* Helpers */
+/* -------------------------------------------------------------------------- */
+
+function isTrustedOrigin(origin: string) {
+  return origin.includes("sitecorecloud.io") || origin === window.location.origin
+}
+
+function dedupeIssues(issues: StructuredIssue[]) {
+  const map = new Map()
+
+  issues.forEach((issue) => {
+    const key = issue.type + issue.element
+    if (!map.has(key)) map.set(key, issue)
+  })
+
+  return [...map.values()]
+}
+
+function calculateScore(issues: StructuredIssue[]) {
+  let score = 100
+
+  issues.forEach((i) => {
+    if (i.impact === "critical") score -= 10
+    if (i.impact === "serious") score -= 6
+    if (i.impact === "moderate") score -= 3
+  })
+
+  return Math.max(score, 0)
+}
+
+/* -------------------------------------------------------------------------- */
+/* Extract Sitecore renderings */
+/* -------------------------------------------------------------------------- */
+
+function extractRenderings(context: unknown): ExtractedRendering[] {
+  const renderings: ExtractedRendering[] = []
+
+  try {
+    const ctx = context as Record<string, unknown>
+    const presentationDetails = (ctx?.pageInfo as Record<string, unknown>)?.presentationDetails
+
+    if (typeof presentationDetails !== "string") return renderings
+
+    const presentation = JSON.parse(presentationDetails)
+
+    for (const device of presentation?.devices ?? []) {
+      for (const r of device.renderings ?? []) {
+        renderings.push({
+          renderingId: r.instanceId ?? "",
+          componentId: r.id ?? "",
+          placeholder: r.placeholderKey ?? "",
+          dataSource: r.dataSource ?? "",
+        })
+      }
+    }
+  } catch {}
+
+  return renderings
+}
+
+/* -------------------------------------------------------------------------- */
+/* Scan API */
+/* -------------------------------------------------------------------------- */
+
+function getScanApiUrl() {
+  return "/api/scan-a11y"
+}
+
+async function callScanApi(issues: StructuredIssue[]): Promise<ScanResult | { error: string }> {
+  const res = await fetch(getScanApiUrl(), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ issues }),
+  })
+
+  const text = await res.text()
+
+  try {
+    const data = JSON.parse(text)
+
+    if (!res.ok) {
+      return { error: data.error ?? "Scan failed" }
+    }
+
+    return data
+  } catch {
+    return { error: "Invalid JSON from server" }
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Preview Scan Script */
+/* -------------------------------------------------------------------------- */
+
+function runScanInPreview() {
+  const script = `
+(function(){
+
+function loadAxe(cb){
+  if(window.axe){ cb(); return; }
+
+  var s=document.createElement("script");
+  s.src="https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.2/axe.min.js";
+  s.onload=cb;
+  document.head.appendChild(s);
+}
+
+loadAxe(function(){
+
+  axe.run(document).then(function(results){
+
+    var issues=[];
+
+    (results.violations||[]).forEach(function(v){
+
+      (v.nodes||[]).forEach(function(n){
+
+        var selector=n.target.join(" ");
+        var el=document.querySelector(selector);
+
+        var html=null;
+
+        if(el){
+          html=el.outerHTML.substring(0,300);
+
+          el.style.outline="3px solid red";
+          el.setAttribute("data-a11y-issue",v.id);
+        }
+
+        issues.push({
+          type:v.id,
+          description:v.description,
+          help:v.help,
+          helpUrl:v.helpUrl,
+          impact:v.impact,
+          wcag:(v.tags||[]).join(", "),
+          element:selector,
+          html:html
+        });
+
+      });
+
+    });
+
+    window.parent.postMessage({
+      type:"A11Y_SCAN_RESULT",
+      issues:issues
+    },"*");
+
+  });
+
+});
+
+})();`.trim()
+
+  window.parent.postMessage(
+    {
+      type: EXECUTE_IN_PREVIEW,
+      script,
+    },
+    "*"
+  )
+}
+
+/* -------------------------------------------------------------------------- */
+/* Component */
+/* -------------------------------------------------------------------------- */
+
+export default function AccessibilityScanner() {
+  const client = useMarketplaceClient()
+
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [result, setResult] = useState<ScanResult | null>(null)
+  const [pagesContext, setPagesContext] = useState<unknown>(null)
 
-  async function runScan() {
-    setError(null)
-    setResult(null)
-    setLoading(true)
-    try {
-      const html =
-        typeof document !== "undefined"
-          ? document.body?.innerHTML ?? document.documentElement?.outerHTML ?? ""
-          : ""
-      const res = await fetch("/api/scan-a11y", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ html }),
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        setError(data.error ?? `Request failed (${res.status})`)
+  const gotResultRef = useRef(false)
+
+  /* ---------------------------------------------------------------------- */
+  /* Subscribe to pages.context */
+  /* ---------------------------------------------------------------------- */
+
+  useEffect(() => {
+    client.query("pages.context", {
+      subscribe: true,
+      onSuccess: (data) => setPagesContext(data),
+      onError: () => setPagesContext(null),
+    })
+  }, [client])
+
+  /* ---------------------------------------------------------------------- */
+  /* Listen for preview scan results */
+  /* ---------------------------------------------------------------------- */
+
+  useEffect(() => {
+    function handleMessage(event: MessageEvent) {
+      if (!isTrustedOrigin(event.origin)) return
+
+      if (event.data?.type !== A11Y_SCAN_RESULT) return
+
+      gotResultRef.current = true
+      setLoading(false)
+
+      const rawIssues = event.data.issues ?? []
+      const issues = dedupeIssues(rawIssues)
+
+      if (issues.length === 0) {
+        setResult({
+          issues: [],
+          accessibilityScore: 100,
+          summary: "No accessibility issues detected.",
+        })
         return
       }
-      setResult(data as ScanA11yResult)
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Scan failed")
+
+      callScanApi(issues).then((res) => {
+        if ("error" in res) {
+          setError(res.error)
+        } else {
+          setResult(res)
+        }
+      })
+    }
+
+    window.addEventListener("message", handleMessage)
+    return () => window.removeEventListener("message", handleMessage)
+  }, [])
+
+  /* ---------------------------------------------------------------------- */
+  /* Fallback scan */
+  /* ---------------------------------------------------------------------- */
+
+  async function fallbackRenderingScan() {
+    try {
+      const res = await client.query("pages.context")
+      const context = (res as { data?: unknown })?.data ?? res
+
+      const renderingsList = extractRenderings(context)
+
+      const issues: StructuredIssue[] = renderingsList.map((r) => ({
+        type: "rendering-accessibility-check",
+        description: "Accessibility review required for this component",
+        element: r.placeholder || "component",
+        rendering: r.dataSource,
+        renderingId: r.renderingId,
+        componentId: r.componentId,
+      }))
+
+      const apiRes = await callScanApi(issues)
+
+      if ("error" in apiRes) {
+        setError(apiRes.error)
+      } else {
+        setResult(apiRes)
+      }
+    } catch {
+      setError("Fallback scan failed")
     } finally {
       setLoading(false)
     }
   }
 
-  if (loading) return <Skeleton className="h-24 w-full" />
+  /* ---------------------------------------------------------------------- */
+  /* Run scan */
+  /* ---------------------------------------------------------------------- */
 
-  const scoreColor = cn({
-    'text-success': result?.accessibilityScore && result.accessibilityScore > 80,
-    'text-warning-400': result?.accessibilityScore && result.accessibilityScore > 60,
-    'text-danger': result?.accessibilityScore && result.accessibilityScore <= 60,
-  })
-  const resultsBoxStyles = cn({
-    'bg-success/30 border-success': result?.accessibilityScore && result.accessibilityScore > 80,
-    'bg-warning-50/30 border-warning-300': result?.accessibilityScore && result.accessibilityScore > 60,
-    'bg-danger/30 border-danger': result?.accessibilityScore && result.accessibilityScore <= 60,
-  })
+  function runScan() {
+    setLoading(true)
+    setError(null)
+    setResult(null)
+    gotResultRef.current = false
+
+    runScanInPreview()
+
+    setTimeout(() => {
+      if (gotResultRef.current) return
+      fallbackRenderingScan()
+    }, 4000)
+  }
+
+  const renderings = extractRenderings(pagesContext)
+
+  /* ---------------------------------------------------------------------- */
+  /* UI */
+  /* ---------------------------------------------------------------------- */
 
   return (
     <div className="space-y-4">
-      <p className="text-muted-foreground text-md">
-        Scan the current page with an LLM to find accessibility issues (WCAG).
+
+      <p className="text-muted-foreground text-sm">
+        Scans the Sitecore preview DOM using axe-core and sends issues to AI for explanation.
       </p>
-      <Button
-        variant="default"
-        colorScheme="primary"
-        onClick={runScan}
-        disabled={loading}
-      >
-        {loading ? "Scanning…" : "Scan for accessibility issues"}
+
+      <Button onClick={runScan} disabled={loading}>
+        {loading ? "Scanning accessibility..." : "Scan page accessibility"}
       </Button>
+
       {error && (
-        <Alert variant="danger">
+        <Alert variant="destructive">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
+
       {result && (
-        <div className={cn("space-y-4 rounded-lg border p-4", resultsBoxStyles)}>
-          <div className="flex items-center gap-1">
-            <p className={cn("text-5xl font-semibold tabular-nums", scoreColor)}>
-              {result.accessibilityScore}
-            </p>
-            <sub className="text-xl text-muted-foreground">/100</sub>
+        <div className="space-y-4 rounded-lg border bg-muted/30 p-4">
+
+          <div className="flex items-center gap-2">
+            <span className="text-2xl font-semibold">{result.accessibilityScore}</span>
+            <span>/ 100</span>
           </div>
-          {result.summary && (
-            <p className="text-sm text-muted-foreground">{result.summary}</p>
-          )}
-          {result.issues.length > 0 && (
-            <div>
-              <h3 className="mb-2 font-semibold">Issues</h3>
-              <ul className="list-inside list-disc space-y-1 text-sm">
-                {result.issues.map((issue, i) => (
-                  <li key={i} className="flex flex-wrap gap-1">
-                    <span
-                      className={
-                        issue.severity === "error"
-                          ? "text-danger-600 dark:text-danger-400"
-                          : issue.severity === "warning"
-                            ? "text-warning-400 dark:text-warning-400"
-                            : "text-muted-foreground"
-                      }
-                    >
-                      [{issue.severity}]
-                    </span>
-                    {issue.wcag && (
-                      <span className="text-muted-foreground">
-                        {issue.wcag}
-                      </span>
-                    )}
-                    {issue.message}
-                    {issue.element && (
-                      <span className="text-muted-foreground">
-                        — {issue.element}
-                      </span>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          {result.suggestions.length > 0 && (
-            <div>
-              <h3 className="mb-2 font-semibold">Suggestions</h3>
-              <ul className="list-inside list-disc space-y-1 text-sm text-muted-foreground">
-                {result.suggestions.map((s, i) => (
-                  <li key={i}>{s}</li>
-                ))}
-              </ul>
-            </div>
-          )}
+
+          <ul className="space-y-3">
+            {result.issues.map((i, idx) => (
+              <li key={idx} className="border rounded p-3 text-sm">
+
+                <div className="font-medium">
+                  {i.help ?? i.type}
+                </div>
+
+                {i.wcag && (
+                  <div className="text-xs text-muted-foreground mt-1">
+                    WCAG: {i.wcag}
+                  </div>
+                )}
+
+                {i.html && (
+                  <pre className="text-xs bg-muted p-2 rounded mt-2 overflow-auto">
+                    {i.html}
+                  </pre>
+                )}
+
+                <p className="mt-2">{i.explanation}</p>
+
+                <p className="mt-1">
+                  <b>Fix:</b> {i.suggestion}
+                </p>
+
+                {i.helpUrl && (
+                  <a
+                    className="text-xs text-blue-500 underline mt-1 block"
+                    href={i.helpUrl}
+                    target="_blank"
+                  >
+                    Learn more
+                  </a>
+                )}
+
+              </li>
+            ))}
+          </ul>
+
         </div>
       )}
+
+      {renderings.length > 0 && (
+        <details className="text-xs text-muted-foreground">
+          <summary>Renderings on page ({renderings.length})</summary>
+
+          <pre className="mt-1 overflow-auto rounded bg-muted p-2">
+            {JSON.stringify(renderings, null, 2)}
+          </pre>
+
+        </details>
+      )}
+
     </div>
   )
 }
-
-function PagesContext() {
-  const client = useMarketplaceClient()
-  const [pagesContext, setPagesContext] = useState<unknown>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    client.query("pages.context", {
-      subscribe: true,
-      onSuccess: (data) => {
-        setPagesContext(data)
-        setLoading(false)
-      },
-      onError: (err) => {
-        setError(
-          err instanceof Error ? err.message : "Failed to retrieve pages context"
-        )
-        setLoading(false)
-      },
-    })
-  }, [client])
-
-  if (loading) return <Skeleton className="h-24 w-full" />
-
-  if (error) {
-    return (
-      <Alert variant="danger">
-        <AlertDescription>{error}</AlertDescription>
-      </Alert>
-    )
-  }
-
-  return (
-    <pre className="bg-muted p-4 rounded-md text-sm overflow-auto">
-      {JSON.stringify(pagesContext, null, 2)}
-    </pre>
-  )
-}
-
-function Examples() {
-  return (
-    <div className="container mx-auto p-6 space-y-8 max-w-3xl">
-      <div className="space-y-4">
-        <h2 className="text-2xl font-semibold">Accessibility Scan</h2>
-        <AccessibilityScanner />
-      </div>
-    </div>
-  );
-}
-
-export default Examples;
