@@ -641,6 +641,9 @@
 }
 
 @layer base {
+  body {
+    font-family: 'Inter', sans-serif;
+  }
   * {
     @apply border-border outline-ring/50;
     }
