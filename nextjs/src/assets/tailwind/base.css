@@ -21,5 +21,10 @@
   .container a {
     @apply text-primary text-copy-medium hover:text-primary hover:underline transition-colors duration-300;
   }
+
+  input,
+  textarea {
+    @apply border border-monochrome-light rounded-sm p-2 placeholder:text-monochrome-light/30;
+  }
 }
 
