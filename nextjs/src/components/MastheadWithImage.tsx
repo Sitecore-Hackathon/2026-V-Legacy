@@ -22,7 +22,7 @@ const MastheadWithImage = ({ fields, rendering }: MastheadWithImageProps): JSX.E
   const src = img?.src ?? '';
 
   return (
-    <section className="bg-amber-500 py-large" aria-labelledby={`masthead-${uid}`}>
+    <section className="bg-primary py-large" aria-labelledby={`masthead-${uid}`}>
       <div className="container my-0 flex flex-col gap-4 lg:flex-row">
         <div className="m-auto w-1/2">
           <Text tag="p" className="text-h2 w-fit mb-4" field={fields.heading} />
