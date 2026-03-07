@@ -30,7 +30,7 @@ const CtaRow = ({ fields }: CtaRowProps): JSX.Element => {
         </a>
         <Text tag="p" className="text-h2 text-white" field={fields.heading} />
       </div>
-      <div className="">
+      <div className="mt-4">
         <Text field={fields.description} className="text-copy-medium" />
       </div>
       <a
