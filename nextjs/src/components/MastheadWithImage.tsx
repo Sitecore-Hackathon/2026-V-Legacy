@@ -16,25 +16,28 @@ type MastheadWithImageProps = ComponentProps & {
 /**
  * Masthead with image: heading, multiline description, and image.
  */
-const MastheadWithImage = ({ fields }: MastheadWithImageProps): JSX.Element => {
+const MastheadWithImage = ({ fields, rendering }: MastheadWithImageProps): JSX.Element => {
+  const uid = rendering.uid;
   const img = fields.image?.value;
   const src = img?.src ?? '';
-  const alt = img?.alt ?? fields.heading?.value ?? '';
 
   return (
-    <header className="masthead-with-image">
-      <div className="masthead-with-image__content">
-        <Text tag="h1" className="masthead-with-image__heading" field={fields.heading} />
-        <div className="masthead-with-image__description">
-          <Text field={fields.description} />
-        </div>
+    <section
+      className="container flex flex-col gap-4 lg:flex-row"
+      aria-labelledby={`masthead-${uid}`}
+    >
+      <div className="m-auto w-1/2">
+        <Text tag="p" className="text-h2 w-fit mb-4" field={fields.heading} />
+        <Text tag="p" className="text-copy-medium w-[80%]" field={fields.description} />
       </div>
       {src && (
-        <div className="masthead-with-image__media">
-          <Image src={src} alt={alt} width={1200} height={630} className="masthead-with-image__img" />
+        <div className="rounded-lg overflow-hidden aspect-4/3 w-1/2">
+          {/* eslint-disable-next-line jsx-a11y/alt-text */}
+          {/* @ts-expect-error - alt omitted intentionally for a11y testing */}
+          <Image src={src} width={1200} height={630} className="size-full object-cover" />
         </div>
       )}
-    </header>
+    </section>
   );
 };
 

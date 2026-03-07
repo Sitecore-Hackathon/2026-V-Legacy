@@ -1,0 +1,122 @@
+@theme {
+  --breakpoint-*: initial;
+  --breakpoint-sm: 30rem; /* Mobile: 480px */
+  --breakpoint-md: 48rem; /* Tablet: 768px */
+  --breakpoint-lg: 64rem; /* Desktop: 1024px */
+  --breakpoint-xl: 80rem; /* Wide: 1280px */
+  --breakpoint-2xl: 90rem; /* 2x Wide: 1440px */
+
+  --text-*: initial;
+  --text-hxl: 3.5rem;
+  --text-hxl--line-height: 3rem;
+  --text-hxl--font-weight: 700;
+  --text-h1: 2.25rem;
+  --text-h1--line-height: 2.375rem;
+  --text-h1--font-weight: 700;
+  --text-h2: 2rem;
+  --text-h2--line-height: 2.25rem;
+  --text-h2--font-weight: 700;
+  --text-h3: 1.5rem;
+  --text-h3--line-height: 1.75rem;
+  --text-h3--font-weight: 700;
+  --text-h4: 1.125rem;
+  --text-h4--line-height: 1.25rem;
+  --text-h4--font-weight: 700;
+  --text-h5: 1rem;
+  --text-h5--line-height: 1.125rem;
+  --text-h5--font-weight: 700;
+  --text-h6: 0.875rem;
+  --text-h6--line-height: 1rem;
+  --text-h6--font-weight: 700;
+  --text-copy-large: 1rem;
+  --text-copy-large--line-height: 1.5rem;
+  --text-copy-medium: 0.875rem;
+  --text-copy-medium--line-height: 1.25rem;
+  --text-copy-small: 0.75rem;
+  --text-copy-small--line-height: 1rem;
+
+  --spacing-x-small: --spacing(1);
+  --spacing-small: --spacing(2);
+  --spacing-medium: --spacing(4);
+  --spacing-large: --spacing(6);
+  --spacing-x-large: --spacing(8);
+  --spacing-2x-large: --spacing(10);
+  --spacing-3x-large: --spacing(12);
+  --spacing-4x-large: --spacing(14);
+  --spacing-page-regular: --spacing(6);
+  --spacing-page-large: --spacing(6);
+  --spacing-page-x-large: --spacing(6);
+
+  --radius-*: initial;
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 24px;
+  --radius-lg: 40px;
+  --radius-xl: 80px;
+  --radius-full: 1000px;
+}
+
+@layer base {
+  :root {
+    @media (min-width: theme(breakpoint-md)) {
+      --text-h1: 3rem;
+      --text-h1--line-height: 3.125rem;
+      --text-h2: 2.375rem;
+      --text-h2--line-height: 2.75rem;
+      --text-h3: 1.75rem;
+      --text-h3--line-height: 2.25rem;
+
+      --spacing-x-small: --spacing(2);
+      --spacing-small: --spacing(3);
+      --spacing-medium: --spacing(5);
+      --spacing-large: --spacing(8);
+      --spacing-x-large: --spacing(12);
+      --spacing-2x-large: --spacing(14);
+      --spacing-3x-large: --spacing(16);
+      --spacing-4x-large: --spacing(18);
+    }
+
+    @media (min-width: theme(breakpoint-lg)) {
+      --text-hxl: 6.25rem;
+      --text-hxl--font-weight: 700;
+      --text-hxl--line-height: 6.25rem;
+      --text-h1: 4rem;
+      --text-h1--line-height: 4.125rem;
+      --text-h2: 2.625rem;
+      --text-h2--line-height: 3rem;
+      --text-h3: 2rem;
+      --text-h3--line-height: 2.25rem;
+      --text-h4: 1.5rem;
+      --text-h4--line-height: 1.75rem;
+      --text-h5: 1.125rem;
+      --text-h5--line-height: 1.5rem;
+      --text-h6: 0.875rem;
+      --text-h6--line-height: 1.25rem;
+      --text-copy-large: 1.125rem;
+      --text-copy-large--line-height: 1.875rem;
+      --text-copy-medium: 1rem;
+      --text-copy-medium--line-height: 1.625rem;
+      --text-copy-small: 0.75rem;
+      --text-copy-small--line-height: 1.25rem;
+
+      --spacing-x-small: --spacing(2);
+      --spacing-small: --spacing(4);
+      --spacing-medium: --spacing(6);
+      --spacing-large: --spacing(10);
+      --spacing-x-large: --spacing(14);
+      --spacing-2x-large: --spacing(16);
+      --spacing-3x-large: --spacing(18);
+      --spacing-4x-large: --spacing(20);
+      --spacing-page-regular: --spacing(18);
+      --spacing-page-large: --spacing(24);
+      --spacing-page-x-large: --spacing(36);
+    }
+
+    @media (min-width: theme(breakpoint-xl)) {
+      --spacing-page-regular: --spacing(36);
+      --spacing-page-large: --spacing(56);
+      --spacing-page-x-large: --spacing(86);
+    }
+  }
+}
+

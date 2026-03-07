@@ -1,0 +1,25 @@
+@layer base {
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f3f3f3;
+  }
+
+  *:focus-visible {
+    @apply outline-2 outline-offset-2 outline-amber-500;
+  }
+
+  .container {
+    position: relative;
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+
+  .container {
+    @apply my-page-regular;
+  }
+
+  .container a {
+    @apply text-amber-500 text-copy-medium hover:text-amber-600 hover:underline transition-colors duration-300;
+  }
+}
+

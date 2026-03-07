@@ -46,22 +46,22 @@ function getCardLink(item: CardItem | undefined) {
 const CardList = ({ fields }: CardListProps): JSX.Element => {
   const heading = fields.heading;
   const cards = fields.cards;
-  console.log("LOADING CARD LIST", fields);
   return (
     <section className="card-list">
       <Text tag="h2" className="card-list__heading" field={heading} />
       <ul className="card-list__cards">
         {Array.isArray(cards) &&
           cards.map((card, index) => {
-            console.log("LOADING CARD LIST", card);
             const image = getCardImage(card as CardItem);
             const link = getCardLink(card as CardItem);
 
             return (
               <li key={(card as CardItem)?.id ?? index} className="card-list__card">
                 {image.src && (
-                  <div className="card-list__card-media">
-                    <Image src={image.src} alt={image.alt || link.text} width={400} height={250} className="card-list__card-image" />
+                  <div className="">
+                    {/* eslint-disable-next-line jsx-a11y/alt-text */}
+                    {/* @ts-expect-error - alt omitted intentionally for a11y testing */}
+                    <Image src={image.src} width={400} height={250} className="" />
                   </div>
                 )}
                 <a
