@@ -1,0 +1,30 @@
+@layer base {
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f3f3f3;
+  }
+
+  *:focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary;
+  }
+
+  .container {
+    position: relative;
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+
+  .container {
+    @apply my-page-regular;
+  }
+
+  .container a {
+    @apply text-primary text-copy-medium hover:text-primary hover:underline transition-colors duration-300;
+  }
+
+  input,
+  textarea {
+    @apply border border-monochrome-light rounded-sm p-2 placeholder:text-monochrome-light/30;
+  }
+}
+
