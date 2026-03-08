@@ -6,28 +6,30 @@
   
 # Hackathon Submission Entry form
 
-> __Important__  
-> 
-> Copy and paste the content of this file into README.md or face automatic __disqualification__  
-> All headlines and subheadlines shall be retained if not noted otherwise.  
-> Fill in text in each section as instructed and then delete the existing text, including this blockquote.
 
 You can find a very good reference to Github flavoured markdown reference in [this cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet). If you want something a bit more WYSIWYG for editing then could use [StackEdit](https://stackedit.io/app) which provides a more user friendly interface for generating the Markdown code. Those of you who are [VS Code fans](https://code.visualstudio.com/docs/languages/markdown#_markdown-preview) can edit/preview directly in that interface too.
 
 ## Team name
-⟹ Write the name of your Hackathon team here
+V Legacy
 
 ## Category
-⟹ Write the name of the selected category
+Best Marketplace App for Sitecore AI - Build something publishable. Not just a demo.
 
 ## Description
-⟹ Write a clear description of your hackathon entry.  
 
-  - Module Purpose
-  - What problem was solved (if any)
-    - How does this module solve it
+**SitecoreA11Y** is a Sitecore Marketplace app that brings real-time accessibility auditing directly into the Sitecore Pages editor. Content authors and developers can scan any page for WCAG violations without leaving the CMS.
 
-_You can alternately paste a [link here](#docs) to a document within this repo containing the description._
+- **Module Purpose**  
+  A Page Builder Context Panel extension that scans the live preview for accessibility issues using [axe-core](https://github.com/dequelabs/axe-core), then enriches every violation with AI-generated explanations and fix suggestions powered by the Sitecore Marketplace AI SDK.
+
+- **What problem was solved**  
+  Accessibility defects are usually caught late — during QA or after launch — because content authors have no visibility into WCAG compliance while they build pages. Manual audits are slow, expensive, and disconnected from the authoring workflow.
+
+  - **How this module solves it**  
+    1. The app subscribes to `pages.context` so it reacts whenever the author navigates or edits a page.  
+    2. On demand, it injects axe-core into the Sitecore preview iframe via `EXECUTE_IN_PREVIEW`, runs a full DOM audit, and highlights offending elements with a red outline.  
+    3. Raw violations are deduplicated, scored by impact, and sent to an AI endpoint that returns plain-language explanations and actionable fix suggestions (categorised as code or content fixes).  
+    4. Results are displayed in-context with an accessibility score (0–100), WCAG tags, the offending HTML snippet, and deep links to Deque's rule documentation — all visible in the Page Builder side panel without any context switch.
 
 ## Video link
 ⟹ Provide a video highlighing your Hackathon module submission and provide a link to the video. You can use any video hosting, file share or even upload the video to this repository. _Just remember to update the link below_
@@ -36,13 +38,15 @@ _You can alternately paste a [link here](#docs) to a document within this repo c
 
 ## Pre-requisites and Dependencies
 
-⟹ Does your module rely on other Sitecore modules or frameworks?
-
-- List any dependencies
-- Or other modules that must be installed
-- Or services that must be enabled/configured
-
-_Remove this subsection if your entry does not have any prerequisites other than Sitecore_
+- **Sitecore XM Cloud** subscription with access to the **Pages** editor
+- **Sitecore Cloud Portal** developer account with permissions to register Marketplace apps
+- **Node.js** 16+ and **npm** 10+
+- **OpenAI API key** — used by the `/api/scan-a11y` route to generate plain-language explanations and fix suggestions for each accessibility violation
+- **Sitecore Marketplace SDK packages** (installed via npm):
+  - `@sitecore-marketplace-sdk/client` ^0.3.2
+  - `@sitecore-marketplace-sdk/xmc` ^0.4.1
+  - `@sitecore-marketplace-sdk/ai` ^0.1.0
+- **axe-core** ^4.11.1 — injected at runtime into the Sitecore preview iframe for WCAG auditing
 
 ## Installation instructions
 ⟹ Write a short clear step-wise instruction on how to install your module.  

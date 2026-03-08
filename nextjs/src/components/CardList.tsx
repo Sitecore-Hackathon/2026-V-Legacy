@@ -50,7 +50,7 @@ const CardList = ({ fields, rendering }: CardListProps): JSX.Element => {
 
   return (
     <section className="container" aria-labelledby={`card-list-${uid}`}>
-      <Text tag="p" className="text-h2 text-center mb-4" field={heading} />
+      <Text tag="h2" className="text-h2 text-center mb-4" field={heading} id={`card-list-${uid}`} />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {Array.isArray(cards) &&
           cards.map((card, index) => {
@@ -70,19 +70,18 @@ const CardList = ({ fields, rendering }: CardListProps): JSX.Element => {
                     className="after:content-[''] after:absolute after:inset-0 after:w-full after:h-full after:z-1"
                   >
                     <div className="aspect-square size-full overflow-hidden">
-                      {/* eslint-disable-next-line jsx-a11y/alt-text */}
-                      {/* @ts-expect-error - alt omitted intentionally for a11y testing */}
                       <Image
                         src={image.src}
                         width={400}
                         height={250}
                         className="size-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        alt={image.alt}
                       />
                     </div>
                   </a>
                 )}
                 <div className="p-4 bg-secondary-light group-hover:bg-secondary transition-colors duration-300">
-                  <p className="text-copy-medium text-center">{link.text}</p>
+                  <h3 className="text-copy-medium text-center">{link.text}</h3>
                 </div>
               </li>
             );
