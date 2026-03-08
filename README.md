@@ -34,7 +34,7 @@ Best Marketplace App for Sitecore AI - Build something publishable. Not just a d
 ## Video link
 ⟹ Provide a video highlighing your Hackathon module submission and provide a link to the video. You can use any video hosting, file share or even upload the video to this repository. _Just remember to update the link below_
 
-⟹ [Replace this Video link](#video-link)
+⟹ [https://youtu.be/_xhmNzot_uk](#video-link)
 
 ## Pre-requisites and Dependencies
 
@@ -77,19 +77,36 @@ cp .env.example .env
 ```
 
 ## Usage instructions
-⟹ Provide documentation about your module, how do the users use your module, where are things located, what do the icons mean, are there any secret shortcuts etc.
 
-Include screenshots where necessary. You can add images to the `./images` folder and then link to them from your documentation:
+**Where to find it**  
+SitecoreA11Y runs as a **context panel** in the Sitecore Pages editor. After the app is registered and connected to your XM Cloud project, open any page in Pages — the accessibility panel appears in the side panel (context panel area).
 
-![Hackathon Logo](docs/images/hackathon.png?raw=true "Hackathon Logo")
+**How to run a scan**
 
-You can embed images of different formats too:
+1. In the Pages editor, open the page you want to audit.
+2. Open the SitecoreA11Y context panel.
+3. Click **"Scan page accessibility"**.  
+   The app injects axe-core into the page preview, runs a full WCAG audit, sends violations to the AI endpoint for explanations and fix suggestions, then shows the results in the panel.
+4. While the scan runs, the panel shows a loading state ("Scanning accessibility...").
 
-![Deal With It](docs/images/deal-with-it.gif?raw=true "Deal With It")
+**Reading the results**
 
-And you can embed external images too:
+- **Accessibility score** — A number from 0 to 100 at the top. Color indicates severity: green (e.g. >80), amber (e.g. 60–80), red (e.g. ≤60).
+- **Issues list** — Each item includes:
+  - **Rule name** (axe rule / issue type)
+  - **Rendering** — Sitecore component that contains the issue (when available)
+  - **WCAG** — Related WCAG criterion/criteria
+  - **HTML snippet** — Offending element markup
+  - **Explanation** — Plain-language description of the issue (AI-generated)
+  - **Fix** — Suggested fix (code or content)
+  - **Learn more** — Link to Deque’s rule documentation
 
-![Random](https://thiscatdoesnotexist.com/)
+Violations are also highlighted in the page preview (red outline) so you can see where each issue appears.
+
+**Optional**  
+Expand **"Renderings on page"** at the bottom to see the list of renderings detected on the current page (for debugging or context).
+
+You can add screenshots to the `docs/images` folder and link them here to illustrate the panel and results.
 
 ## Comments
 If you'd like to make additional comments that is important for your module entry.
