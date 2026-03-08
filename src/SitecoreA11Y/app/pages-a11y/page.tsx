@@ -4,6 +4,8 @@ import { useMarketplaceClient } from "@/components/providers/marketplace"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
+import { cn } from "@/lib/utils"
+import { Skeleton } from "@/components/ui/skeleton"
 
 type RenderingInfo = {
   component: string
@@ -223,10 +225,25 @@ export default function AccessibilityScanner() {
   /* UI */
   /* ------------------------------------------------ */
 
-  return (
-    <div className="space-y-4">
 
-      <p className="text-muted-foreground text-sm">
+  if (loading) return <Skeleton className="rounded-lg w-inherit h-[90vh] m-4 bg-gray-100" />
+
+
+  const scoreColor = cn({
+    'text-success': result?.accessibilityScore && result.accessibilityScore > 80,
+    'text-warning-400': result?.accessibilityScore && result.accessibilityScore > 60,
+    'text-danger': result?.accessibilityScore && result.accessibilityScore <= 60,
+  })
+  const resultsBoxStyles = cn({
+    'bg-success-50/30 border-success': result?.accessibilityScore && result.accessibilityScore > 80,
+    'bg-warning-50/30 border-warning-300': result?.accessibilityScore && result.accessibilityScore > 60,
+    'bg-danger-50/30 border-danger': result?.accessibilityScore && result.accessibilityScore <= 60,
+  })
+
+  return (
+    <div className="space-y-4 p-4">
+
+      <p className="text-muted-foreground text-md">
         Scans the rendered Sitecore page DOM and sends issues to AI for explanation.
       </p>
 
@@ -241,34 +258,33 @@ export default function AccessibilityScanner() {
       )}
 
       {result && (
-        <div className="space-y-4 rounded-lg border bg-muted/30 p-4">
-
-          <div className="flex items-center gap-2">
-            <span className="text-2xl font-semibold">
+        <div className={cn("space-y-4 rounded-lg border p-4", resultsBoxStyles)}>
+          <div className="flex items-center gap-1">
+            <p className={cn("text-5xl font-semibold tabular-nums", scoreColor)}>
               {result.accessibilityScore}
-            </span>
-            <span>/ 100</span>
+            </p>
+            <sub className="text-xl text-muted-foreground">/100</sub>
           </div>
 
           <ul className="space-y-3">
 
             {result.issues.map((i, idx) => (
 
-              <li key={idx} className="border rounded p-3 text-sm">
+              <li key={idx} className="border bg-white rounded p-3 text-sm">
 
-                <div className="font-medium">
+                <div className="text-md font-bold text-warning-400 uppercase">
                   {i.help ?? i.type}
                 </div>
 
                 {i.rendering && (
                   <div className="text-xs text-purple-600 mt-1">
-                    Rendering: {i.rendering}
+                    <b className="text-md font-bold text-info-500">Rendering:</b> {i.rendering}
                   </div>
                 )}
 
                 {i.wcag && (
                   <div className="text-xs text-muted-foreground mt-1">
-                    WCAG: {i.wcag}
+                    <b className="text-md font-bold text-gray-800">WCAG:</b> {i.wcag}
                   </div>
                 )}
 
@@ -280,9 +296,9 @@ export default function AccessibilityScanner() {
 
                 <p className="mt-2">{i.explanation}</p>
 
-                <p className="mt-1">
-                  <b>Fix:</b> {i.suggestion}
-                </p>
+                <div className="">
+                  <b className="text-md font-bold text-success">Fix:</b> <p>{i.suggestion}</p>
+                </div>
 
                 {i.helpUrl && (
                   <a
