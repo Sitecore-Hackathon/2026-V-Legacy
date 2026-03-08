@@ -5,7 +5,6 @@ import config from 'temp/config';
 import Navigation from 'src/Navigation';
 import Scripts from 'src/Scripts';
 
-// Prefix public assets with a public URL to enable compatibility with Sitecore editors.
 const publicUrl = config.publicUrl;
 
 interface LayoutProps {
@@ -26,11 +25,12 @@ const Layout = ({ layoutData, headLinks, componentFactory }: LayoutProps): JSX.E
 
   const fields = route?.fields as RouteFields;
 
-  // When a route template component exists (e.g. GenericLandingPage, GenericDetailPage), use it; otherwise render the placeholder directly.
   const routeName = route?.name;
   const RouteComponent = componentFactory && routeName ? componentFactory(routeName) : null;
+
   const routeParams =
     route && 'params' in route ? (route as { params?: Record<string, string> }).params : {};
+
   const mainContent =
     RouteComponent && route ? (
       <RouteComponent rendering={route} params={routeParams || {}} />
@@ -41,16 +41,84 @@ const Layout = ({ layoutData, headLinks, componentFactory }: LayoutProps): JSX.E
   return (
     <>
       <Scripts />
+
       <Head>
         <title>{fields.pageTitle?.value.toString() || 'Page'}</title>
         <link rel="icon" href={`${publicUrl}/favicon.ico`} />
+
         {headLinks.map((headLink) => (
           <link rel={headLink.rel} key={headLink.href} href={headLink.href} />
         ))}
+
+        {/* Accessibility DOM Bridge */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+(function(){
+
+console.log("[A11Y] DOM bridge loaded");
+
+window.addEventListener("message", function(event){
+
+  if(!event.data) return;
+
+  if(event.data.type === "A11Y_SCAN_REQUEST"){
+
+    console.log("[A11Y] scan request received");
+
+    try{
+
+      const body = document.body;
+      const main = document.querySelector("main");
+      const nextRoot = document.querySelector("#__next");
+
+      console.log("[A11Y] body children:", body?.children?.length);
+      console.log("[A11Y] main found:", !!main);
+      console.log("[A11Y] __next found:", !!nextRoot);
+
+      console.log("[A11Y] image count:", document.querySelectorAll("img").length);
+      console.log("[A11Y] button count:", document.querySelectorAll("button").length);
+      console.log("[A11Y] link count:", document.querySelectorAll("a").length);
+
+      // Delay to ensure Next.js hydration completed
+      setTimeout(function(){
+
+        const html = document.documentElement.outerHTML;
+
+        console.log("[A11Y] DOM preview:", html.substring(0,1000));
+        console.log("[A11Y] DOM length:", html.length);
+
+        event.source.postMessage({
+          type:"A11Y_SCAN_RESULT",
+          html: html
+        },"*");
+
+        console.log("[A11Y] DOM sent back to requester");
+
+      }, 500);
+
+    }catch(err){
+
+      console.error("[A11Y] DOM extraction failed", err);
+
+      event.source.postMessage({
+        type:"A11Y_SCAN_RESULT",
+        error:"DOM extraction failed"
+      },"*");
+
+    }
+
+  }
+
+});
+
+})();`,
+          }}
+        />
       </Head>
 
       <Navigation />
-      {/* root placeholder for the app, which we add components to using route data */}
+
       <div className="body">{mainContent}</div>
     </>
   );
