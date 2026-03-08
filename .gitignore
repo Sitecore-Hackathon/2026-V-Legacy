@@ -1,6 +1,16 @@
 # may contain OAuth secrets, do not commit
 .sitecore/user.json
 
+# API keys and secrets (env files, JSS config, build output with inlined config)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
+scjssconfig.json
+.next/
+
 # NuGet cache for Sitecore CLI
 .sitecore/package-cache/
 
