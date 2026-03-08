@@ -49,30 +49,32 @@ Best Marketplace App for Sitecore AI - Build something publishable. Not just a d
 - **axe-core** ^4.11.1 — injected at runtime into the Sitecore preview iframe for WCAG auditing
 
 ## Installation instructions
-⟹ Write a short clear step-wise instruction on how to install your module.  
 
-> _A simple well-described installation process is required to win the Hackathon._  
-> Feel free to use any of the following tools/formats as part of the installation:
-> - Sitecore Package files
-> - Docker image builds
-> - Sitecore CLI
-> - msbuild
-> - npm / yarn
-> 
-> _Do not use_
-> - TDS
-> - Unicorn
- 
-for example:
-
-1. Use the Sitecore Installation wizard to install the [package](#link-to-package)
-2. ...
-3. profit
+1. Clone this repository.
+2. Install dependencies and run the SitecoreA11Y app:
+   ```bash
+   cd src/SitecoreA11Y
+   npm install
+   ```
+3. Configure environment variables (see **Configuration** below).
+4. Start the dev server: `npm run dev`.
+5. Register and deploy the app in the Sitecore Cloud Portal (Marketplace) and connect it to your XM Cloud Pages environment so the context panel appears in the Pages editor.
 
 ### Configuration
-⟹ If there are any custom configuration that has to be set manually then remember to add all details here.
 
-_Remove this subsection if your entry does not require any configuration that is not fully covered in the installation instructions already_
+Set the following in a `.env` file in `src/SitecoreA11Y/` (copy from `.env.example`). **Do not commit `.env` or put API keys in this repository.**
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `OPENAI_API_KEY` | Yes | Your OpenAI API key. Used by `/api/scan-a11y` to generate explanations and fix suggestions for accessibility violations. |
+| `NEXT_PUBLIC_SCAN_API_BASE_URL` | No | Full URL of your deployed Next.js app (e.g. `https://your-app.vercel.app`) when the app is embedded in XM Cloud, so the scan can call your API. If omitted, the app uses the host's API when available. |
+
+Example (replace with your own values locally; never commit real keys):
+
+```bash
+cp .env.example .env
+# Edit .env and set OPENAI_API_KEY and optionally NEXT_PUBLIC_SCAN_API_BASE_URL
+```
 
 ## Usage instructions
 ⟹ Provide documentation about your module, how do the users use your module, where are things located, what do the icons mean, are there any secret shortcuts etc.
